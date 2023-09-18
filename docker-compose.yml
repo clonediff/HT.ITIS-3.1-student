@@ -2,24 +2,40 @@ version: '3.8'
 services:
   dotnet_postgres:
     image: postgres:alpine
+    container_name: dotnet_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: myPassword
+      POSTGRES_DB: myDB
     
-  dotnet_rabbitmq:
-    image: rabbitmq:3-alpine
-    
-  dotnet_minio:
-    image: minio/minio:latest
-    
-  dotnet_mongodb:
-    image: mongo:latest
-    
-  dotnet_jaeger:
-    image: jaegertracing/all-in-one:latest
+#  dotnet_rabbitmq:
+#    image: rabbitmq:3-alpine
+#
+#  dotnet_minio:
+#    image: minio/minio:latest
+#
+#  dotnet_mongodb:
+#    image: mongo:latest
+#
+#  dotnet_jaeger:
+#    image: jaegertracing/all-in-one:latest
     
   dotnet_main:
-    image: dotnet-web
-    
-  dotnet_mailing:
-    image: dotnet-web
-    
-  dotnet_storage:
-    image: dotnet-web
+    image: homework.main
+    container_name: Homework.MainProject
+    ports:
+      - "8080:80"
+    build:
+      dockerfile: Dotnet.Homeworks.MainProject/Dockerfile
+    environment:
+      ConnectionStrings__Default: "User ID=root;Password=myPassword;Host=dotnet_postgres;Port=5432;Database=myDB;Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;"
+    depends_on: 
+      - dotnet_postgres
+  
+#  dotnet_mailing:
+#    image: dotnet-web
+#    
+#  dotnet_storage:
+#    image: dotnet-web
