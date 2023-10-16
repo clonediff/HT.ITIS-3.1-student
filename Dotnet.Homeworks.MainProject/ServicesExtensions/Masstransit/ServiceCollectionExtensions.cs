@@ -18,4 +18,10 @@ public static class ServiceCollectionExtensions
         });
         return services;
     }
+
+    public static IServiceCollection ConfigureOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<RabbitMqConfig>(configuration.GetSection("RabbitMqConfig"));
+        return services;
+    }
 }

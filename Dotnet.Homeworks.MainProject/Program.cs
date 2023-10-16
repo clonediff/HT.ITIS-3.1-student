@@ -10,8 +10,8 @@ builder.Services.AddControllers();
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
-builder.Services.Configure<RabbitMqConfig>(builder.Configuration.GetSection("RabbitMqConfig"));
+        options.UseNpgsql(builder.Configuration.GetConnectionString("Default")))
+    .ConfigureOptions(builder.Configuration);
 
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>()!;
 builder.Services.AddMasstransitRabbitMq(rabbitMqConfig);

@@ -6,12 +6,9 @@ using Dotnet.Homeworks.Shared.RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("EmailConfig"));
-builder.Services.Configure<RabbitMqConfig>(builder.Configuration.GetSection("RabbitMqConfig"));
-
-builder.Services.AddScoped<IEmailConsumer, EmailConsumer>();
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>()!;
-builder.Services.AddMasstransitRabbitMq(rabbitMqConfig);
+builder.Services.AddMasstransitRabbitMq(rabbitMqConfig)
+    .ConfigureOptions(builder.Configuration);
 
 builder.Services.AddScoped<IMailingService, MailingService>();
 
