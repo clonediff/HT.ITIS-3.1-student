@@ -25,7 +25,7 @@ public class MailingService : IMailingService
         message.Subject = emailDto.Subject ?? "";
         var bodyBuilder = new BodyBuilder
         {
-            TextBody = $"Your message: {emailDto.Content}"
+            TextBody = emailDto.Content
         };
         message.Body = bodyBuilder.ToMessageBody();
         using var client = new SmtpClient();

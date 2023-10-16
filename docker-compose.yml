@@ -10,18 +10,23 @@ services:
       POSTGRES_PASSWORD: myPassword
       POSTGRES_DB: myDB
     
-#  dotnet_rabbitmq:
-#    image: rabbitmq:3-alpine
-#
-#  dotnet_minio:
-#    image: minio/minio:latest
-#
-#  dotnet_mongodb:
-#    image: mongo:latest
-#
-#  dotnet_jaeger:
-#    image: jaegertracing/all-in-one:latest
+  dotnet_rabbitmq:
+    image: rabbitmq:3-alpine
+    ports:
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "admin"
     
+    #  dotnet_minio:
+    #    image: minio/minio:latest
+    #
+    #  dotnet_mongodb:
+    #    image: mongo:latest
+    #
+    #  dotnet_jaeger:
+    #    image: jaegertracing/all-in-one:latest
+  
   dotnet_main:
     image: homework.main
     container_name: Homework.MainProject
@@ -31,11 +36,33 @@ services:
       dockerfile: Dotnet.Homeworks.MainProject/Dockerfile
     environment:
       ConnectionStrings__Default: "User ID=root;Password=myPassword;Host=dotnet_postgres;Port=5432;Database=myDB;Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;"
-    depends_on: 
+      RabbitMqConfig__Username: "admin"
+      RabbitMqConfig__Password: "admin"
+      RabbitMqConfig__Hostname: "dotnet_rabbitmq"
+      RabbitMqConfig__Port: 5672
+    depends_on:
       - dotnet_postgres
+      - dotnet_rabbitmq
   
-#  dotnet_mailing:
-#    image: dotnet-web
-#    
+  dotnet_mailing:
+    image: homeworks.mailing.api
+    container_name: Homeworks.Mailing.API
+    ports:
+      - "8081:80"
+    build:
+      dockerfile: Dotnet.Homeworks.Mailing.API/Dockerfile
+    environment:
+      EmailConfig__Email: "oristask@gmail.com"
+      EmailConfig__Password: "gomlmldthveiefjr"
+      EmailConfig__Host: "smtp.gmail.com"
+      EmailConfig__Port: 25
+      EmailConfig__WithSsl: true
+      RabbitMqConfig__Username: "admin"
+      RabbitMqConfig__Password: "admin"
+      RabbitMqConfig__Hostname: "dotnet_rabbitmq"
+      RabbitMqConfig__Port: 5672
+    depends_on: 
+      - dotnet_rabbitmq
+
 #  dotnet_storage:
 #    image: dotnet-web

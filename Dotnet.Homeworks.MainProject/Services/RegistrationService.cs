@@ -18,6 +18,7 @@ public class RegistrationService : IRegistrationService
         await Task.Delay(100);
         
         // publish message to a queue
-        await _communicationService.SendEmailAsync(new SendEmail("", "", "", ""));
+        var sendEmail = new SendEmail(userDto.Name, userDto.Email, "Регистрация", $"{userDto.Name}, спасибо за регистрацию :-)");
+        await _communicationService.SendEmailAsync(sendEmail);
     }
 }
