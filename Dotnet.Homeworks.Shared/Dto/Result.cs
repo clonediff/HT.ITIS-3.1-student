@@ -27,4 +27,9 @@ public class Result<TValue> : Result
     public TValue? Value => IsSuccess
         ? _value
         : throw new Exception(Error);
+    
+    public static implicit operator Result<TValue>(TValue success)
+    {
+        return new Result<TValue>(success, true);
+    }
 }

@@ -1,3 +1,7 @@
+using Dotnet.Homeworks.DataAccess.Repositories;
+using Dotnet.Homeworks.Domain.Abstractions.Repositories;
+using Dotnet.Homeworks.Features.Helpers;
+using Dotnet.Homeworks.Infrastructure.UnitOfWork;
 using Dotnet.Homeworks.Shared.RabbitMq;
 using MassTransit;
 
@@ -22,6 +26,18 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureOptions(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<RabbitMqConfig>(configuration.GetSection("RabbitMqConfig"));
+        return services;
+    }
+
+    public static IServiceCollection AddCQRS(this IServiceCollection services)
+    {
+        services
+            .AddScoped<IProductRepository, ProductRepository>()
+            .AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssembly(AssemblyReference.Assembly);
+            });
         return services;
     }
 }
