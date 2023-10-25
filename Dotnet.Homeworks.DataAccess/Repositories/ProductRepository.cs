@@ -21,15 +21,16 @@ public class ProductRepository : IProductRepository
 
     public async Task DeleteProductByGuidAsync(Guid id, CancellationToken cancellationToken)
     {
-        var product = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-        if (product is not null)
-            _dbContext.Products.Remove(product);
+        await _dbContext.Products
+            .Where(x => x.Id == id)
+            .ExecuteDeleteAsync(cancellationToken);
     }
 
-    public Task UpdateProductAsync(Product product, CancellationToken cancellationToken)
+    public async Task UpdateProductAsync(Product product, CancellationToken cancellationToken)
     {
-        _dbContext.Update(product);
-        return Task.CompletedTask;
+        await _dbContext.Products
+            .Where(x => x.Id == product.Id)
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.Name, product.Name), cancellationToken);
     }
 
     public Task<Guid> InsertProductAsync(Product product, CancellationToken cancellationToken)
