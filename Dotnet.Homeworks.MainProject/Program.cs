@@ -1,5 +1,6 @@
 using Dotnet.Homeworks.Data.DatabaseContext;
 using Dotnet.Homeworks.MainProject.Services;
+using Dotnet.Homeworks.MainProject.ServicesExtensions;
 using Dotnet.Homeworks.MainProject.ServicesExtensions.Masstransit;
 using Dotnet.Homeworks.Shared.RabbitMq;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,7 +15,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     .ConfigureOptions(builder.Configuration);
 
 var rabbitMqConfig = builder.Configuration.GetSection("RabbitMqConfig").Get<RabbitMqConfig>()!;
-builder.Services.AddMasstransitRabbitMq(rabbitMqConfig);
+builder.Services
+    .AddMasstransitRabbitMq(rabbitMqConfig)
+    .AddCQRS();
 
 builder.Services.AddSingleton<IRegistrationService, RegistrationService>();
 builder.Services.AddSingleton<ICommunicationService, CommunicationService>();
@@ -26,6 +29,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+await app.MigrateDBAsync();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
