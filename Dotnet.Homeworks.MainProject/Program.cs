@@ -1,5 +1,5 @@
 using Dotnet.Homeworks.Data.DatabaseContext;
-using Dotnet.Homeworks.MainProject.Services;
+using Dotnet.Homeworks.Features.Users.Commands.CreateUser.Services;
 using Dotnet.Homeworks.MainProject.ServicesExtensions;
 using Dotnet.Homeworks.MainProject.ServicesExtensions.Masstransit;
 using Dotnet.Homeworks.Shared.RabbitMq;

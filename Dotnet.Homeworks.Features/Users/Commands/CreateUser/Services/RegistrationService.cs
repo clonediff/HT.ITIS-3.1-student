@@ -1,7 +1,7 @@
-﻿using Dotnet.Homeworks.MainProject.Dto;
+﻿using Dotnet.Homeworks.Features.Users.Commands.CreateUser.Dto;
 using Dotnet.Homeworks.Shared.MessagingContracts.Email;
 
-namespace Dotnet.Homeworks.MainProject.Services;
+namespace Dotnet.Homeworks.Features.Users.Commands.CreateUser.Services;
 
 public class RegistrationService : IRegistrationService
 {

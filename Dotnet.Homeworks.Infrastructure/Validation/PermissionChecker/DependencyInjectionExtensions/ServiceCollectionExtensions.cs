@@ -4,19 +4,35 @@ namespace Dotnet.Homeworks.Infrastructure.Validation.PermissionChecker.Dependenc
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddPermissionChecks(
+    private static readonly Type PermissionCheckType = typeof(IPermissionCheck<>);
+    
+    public static IServiceCollection AddPermissionChecks(
         this IServiceCollection serviceCollection,
         Assembly assembly
     )
     {
-        throw new NotImplementedException();
+        serviceCollection.AddPermissionChecks(new[] { assembly });
+        
+        return serviceCollection;
     }
     
-    public static void AddPermissionChecks(
+    public static IServiceCollection AddPermissionChecks(
         this IServiceCollection serviceCollection,
         Assembly[] assemblies
     )
     {
-        throw new NotImplementedException();
+        var implementations = assemblies
+            .SelectMany(x => x.GetTypes().Where(y =>
+                y.GetInterfaces().Any(z =>
+                    z.IsGenericType && z.GetGenericTypeDefinition() == PermissionCheckType)))
+            .Select(x => new
+            {
+                implType = x,
+                intType = x.GetInterfaces().First(y => y.IsGenericType && y.GetGenericTypeDefinition() == PermissionCheckType),
+            });
+        foreach (var implementation in implementations)
+            serviceCollection.AddTransient(implementation.intType, implementation.implType);
+
+        return serviceCollection;
     }
 }
