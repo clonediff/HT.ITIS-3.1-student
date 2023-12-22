@@ -1,6 +1,10 @@
 ﻿using Dotnet.Homeworks.Domain.Entities;
-using Dotnet.Homeworks.MainProject.Dto;
-using Dotnet.Homeworks.MainProject.Services;
+using Dotnet.Homeworks.Features.Users.Commands.CreateUser;
+using Dotnet.Homeworks.Features.Users.Commands.CreateUser.Dto;
+using Dotnet.Homeworks.Features.Users.Commands.DeleteUser;
+using Dotnet.Homeworks.Features.Users.Commands.UpdateUser;
+using Dotnet.Homeworks.Features.Users.Queries.GetUser;
+using Dotnet.Homeworks.Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dotnet.Homeworks.MainProject.Controllers;
@@ -8,47 +12,52 @@ namespace Dotnet.Homeworks.MainProject.Controllers;
 [ApiController]
 public class UserManagementController : ControllerBase
 {
-    private readonly IRegistrationService _registrationService;
+    private readonly IMediator _mediator;
 
-    public UserManagementController(IRegistrationService registrationService)
+    public UserManagementController(IMediator mediator)
     {
-        _registrationService = registrationService;
+        _mediator = mediator;
     }
 
     [HttpPost("user")]
     public async Task<IActionResult> CreateUserAsync(RegisterUserDto userDto, CancellationToken cancellationToken)
     {
-        await _registrationService.RegisterAsync(userDto);
-        return Ok();
+        var createUserResult = await _mediator.Send(new CreateUserCommand(userDto.Name, userDto.Email), cancellationToken);
+        return createUserResult.IsSuccess ? Ok(createUserResult.Value) : BadRequest(createUserResult.Error);
     }
 
     [HttpGet("profile/{guid}")]
-    public Task<IActionResult> GetProfile(Guid guid, CancellationToken cancellationToken) 
+    public async Task<IActionResult> GetProfileAsync(Guid guid, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var profileResult = await _mediator.Send(new GetUserQuery(guid), cancellationToken);
+        return profileResult.IsSuccess ? Ok(profileResult.Value) : BadRequest(profileResult.Error);
     }
 
     [HttpGet("users")]
-    public Task<IActionResult> GetAllUsers(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllUsersAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var user = await _mediator.Send(new GetUserQuery(Guid.NewGuid()), cancellationToken);
+        return user.IsSuccess ? Ok(user.Value) : BadRequest(user.Error);
     }
 
     [HttpDelete("profile/{guid:guid}")]
-    public Task<IActionResult> DeleteProfile(Guid guid, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteProfileAsync(Guid guid, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var deleteResult = await _mediator.Send(new DeleteUserCommand(guid), cancellationToken);
+        return deleteResult.IsSuccess ? Ok() : BadRequest(deleteResult.Error);
     }
 
     [HttpPut("profile")]
-    public Task<IActionResult> UpdateProfile(User user, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateProfileAsync(User user, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var updateResult = await _mediator.Send(new UpdateUserCommand(user), cancellationToken);
+        return updateResult.IsSuccess ? Ok() : BadRequest(updateResult.Error);
     }
 
     [HttpDelete("user/{guid:guid}")]
-    public Task<IActionResult> DeleteUser(Guid guid, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteUserAsync(Guid guid, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var deleteResult = await _mediator.Send(new DeleteUserCommand(guid), cancellationToken);
+        return deleteResult.IsSuccess ? Ok() : BadRequest(deleteResult.Error);
     }
 }

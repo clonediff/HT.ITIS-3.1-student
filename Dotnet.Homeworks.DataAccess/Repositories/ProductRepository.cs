@@ -28,13 +28,13 @@ public class ProductRepository : IProductRepository
 
     public Task UpdateProductAsync(Product product, CancellationToken cancellationToken)
     {
-        _dbContext.Update(product);
+        _dbContext.Products.Update(product);
         return Task.CompletedTask;
     }
 
     public Task<Guid> InsertProductAsync(Product product, CancellationToken cancellationToken)
     {
-        _dbContext.Add(product);
+        _dbContext.Products.Add(product);
         return Task.FromResult(product.Id);
     }
 }

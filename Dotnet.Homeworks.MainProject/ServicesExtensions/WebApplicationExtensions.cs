@@ -7,8 +7,9 @@ public static class WebApplicationExtensions
 {
     public static async Task<WebApplication> MigrateDBAsync(this WebApplication app)
     {
-        await using var dbContext = app.Services.GetService<AppDbContext>();
-
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetService<AppDbContext>();
+        
         var notApplied = await dbContext!.Database.GetPendingMigrationsAsync();
         if (notApplied.Any())
             await dbContext.Database.MigrateAsync();
