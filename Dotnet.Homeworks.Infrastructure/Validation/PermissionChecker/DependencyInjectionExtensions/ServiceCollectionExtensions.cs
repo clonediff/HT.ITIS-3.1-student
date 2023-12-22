@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
         Assembly[] assemblies
     )
     {
-        var implemetations = assemblies
+        var implementations = assemblies
             .SelectMany(x => x.GetTypes().Where(y =>
                 y.GetInterfaces().Any(z =>
                     z.IsGenericType && z.GetGenericTypeDefinition() == PermissionCheckType)))
@@ -30,8 +30,8 @@ public static class ServiceCollectionExtensions
                 implType = x,
                 intType = x.GetInterfaces().First(y => y.IsGenericType && y.GetGenericTypeDefinition() == PermissionCheckType),
             });
-        foreach (var implemetation in implemetations)
-            serviceCollection.AddTransient(implemetation.intType, implemetation.implType);
+        foreach (var implementation in implementations)
+            serviceCollection.AddTransient(implementation.intType, implementation.implType);
 
         return serviceCollection;
     }

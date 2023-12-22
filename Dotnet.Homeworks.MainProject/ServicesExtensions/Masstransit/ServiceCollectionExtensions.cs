@@ -37,6 +37,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCQRS(this IServiceCollection services)
     {
         services
+            .AddHttpContextAccessor()
             .AddTransient<IProductRepository, ProductRepository>()
             .AddTransient<IUserRepository, UserRepository>()
             .AddTransient<IUnitOfWork, UnitOfWork>()

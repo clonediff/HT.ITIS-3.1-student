@@ -12,20 +12,30 @@ services:
     
   dotnet_rabbitmq:
     image: rabbitmq:3-alpine
+    container_name: dotnet_rabbitmq
     ports:
       - "5672:5672"
     environment:
       RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "admin"
     
-    #  dotnet_minio:
-    #    image: minio/minio:latest
-    #
-    #  dotnet_mongodb:
-    #    image: mongo:latest
-    #
-    #  dotnet_jaeger:
-    #    image: jaegertracing/all-in-one:latest
+  dotnet_minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server --console-address ":9001" /data/
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: adminpassword
+    
+#
+#  dotnet_mongodb:
+#    image: mongo:latest
+#
+#  dotnet_jaeger:
+#    image: jaegertracing/all-in-one:latest
   
   dotnet_main:
     image: homework.main
@@ -64,5 +74,18 @@ services:
     depends_on: 
       - dotnet_rabbitmq
 
-#  dotnet_storage:
-#    image: dotnet-web
+  dotnet_storage:
+    image: homeworks.storage.api
+    container_name: Homeworks.Storage.API
+    ports:
+      - "8082:80"
+    build:
+      dockerfile: Dotnet.Homeworks.Storage.API/Dockerfile
+    environment:
+      MinioConfig__Username: admin
+      MinioConfig__Password: adminpassword
+      MinioConfig__Endpoint: minio
+      MinioConfig__Port: 9000
+      MinioConfig__WithSsl: false
+    depends_on: 
+      - dotnet_minio
